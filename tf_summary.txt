@@ -1,0 +1,70 @@
+텐서플로우 정리
+
+연산은 그래프(노드와 엣지로 이뤄짐)로 그린 뒤 Session 내에서만 실행
+데이터는 tensor로 표현(tensor는 정형화된 다차원 배열)
+변수(variable)은 상태를 유지 
+세션 만들어져 run 함수 호출되기 전까지 어떤것도 실행안함
+graph를 조립하는 구성단계(construction phase) 와 session을 이용해 graph를 실행시키는 실행단계(execution phase)
+
+상수 선언하기
+1*2 매트릭스
+a12 = tf.constant([[3., 3.]])
+
+2*1 매트릭스
+a21 = tf.constant([[2.],[2.]])
+
+행렬 곱하기
+tf.matmul(a12, a21)
+
+세션 실행(default graph를 실행)
+sess = tf.Session()
+
+run() 메서드를 통해 행렬곱 실행
+result = sess.run(product)
+print(result)
+
+session 종료시킴
+sess.close()
+
+또는 with 구문을 통해 마지막에 자동으로 close() 되도록 함
+with tf.Session() as sess:
+    result = sess.run([product])
+    print(result)
+
+텐서플로우는 모든 데이터를 tensor 데이터 구조로 나타낸다. 
+왜냐하면 연산 graph에 있는 작업들 간에는 tensor만 주고 받을 수 있기 때문
+tensor는 n차원의 배열
+[정적인타입(static type), 차원(rank), 형태(shape)]
+
+그래프를 실행하더라도 변수(variable)의 상태는 유지
+
+그래프를 한번 실행 시킨 후에는 init 작업을 통해 변수를 초기화 
+init = tf.global_variables_initializer()
+sess.run(init)
+
+Fetches 를 통해 복수의 tensor를 받아올수도있음
+각 작업들은 tensor 별로 각각 수행 되는 것이 아니라 전체적으로 한번만 수행
+sess.run([fun1, fun2])
+
+Feeds
+tensor들은 상수(constant)와 변수(variable)로 저장
+graph의 연산에게 직접 tensor 값을 줄 수 있는 feed 메커니즘 
+feed 데이터는 run() 으로 전달되어서 run() 의 변수로만 사용
+가장 일반적인 사용방법은
+tf.placeholder()를 사용해서 특정 작업을 feed 작업으로 지정해주는 것
+a = placeholder(tf.float32)
+b = placeholder(tf.float32)
+c = a*b
+sess.run([c], feed_dict = {a:[1.0], b:[2.0]}))
+
+/// mnist 모델
+원핫 벡터는 단 하나의 차원만 1이고, 나머지 차원에서는 0인 벡터
+
+소프트맥스란?
+서로다른 여러 항목중 하나일 확률을 계산하고자 한다면 소프트맥스
+0과 1사이 값으로 이뤄지고 모두 합하면 1이됨
+softmax(시그마wx + b)
+
+nomarlize(exp(x)) 라고 생각하면됨
+즉, exp(xi) / 시그마 exp(x) => 전체분의 확률
+
